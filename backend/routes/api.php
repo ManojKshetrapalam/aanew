@@ -3,7 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\TravelRequestController;
-use App\Http\Controllers\Api\Admin\CRMController;
+use App\Http\Controllers\NeuralApiController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -14,8 +14,7 @@ Route::get('/travel', [TravelRequestController::class, 'index']);
 Route::post('/travel', [TravelRequestController::class, 'store']);
 Route::post('/itineraries/{itinerary}/select', [TravelRequestController::class, 'select']);
 
-// Admin CRM API Routes
-Route::prefix('admin')->group(function () {
-    Route::get('/crm', [CRMController::class, 'index']);
-    Route::patch('/crm/{lead}', [CRMController::class, 'update']);
-});
+// Neural AI Routes
+Route::post('/neural/profile', [NeuralApiController::class, 'getGuestProfile']);
+Route::post('/neural/assess', [NeuralApiController::class, 'assessCandidate']);
+Route::get('/neural/stats', [NeuralApiController::class, 'getGlobalStats']);

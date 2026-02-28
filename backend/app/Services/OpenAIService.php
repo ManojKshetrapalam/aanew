@@ -192,4 +192,74 @@ class OpenAIService
             - image_query: 2-3 descriptive keywords for a premium tourism image of '{$travelRequest->destination}' (e.g. 'grand palace bangkok', 'uluwatu temple bali').
             - days: Array of {$daysCount} objects with 'day' and 'description'";
     }
+
+    /**
+     * Generate a neural personality profile for a guest.
+     */
+    public function generatePersonalityProfile($guestData)
+    {
+        $prompt = "Analyze the following guest data and generate a futuristic 'Neural Personality Profile' for a luxury travel experience:\n" .
+            json_encode($guestData) . "\n\n" .
+            "Return a JSON object with: personality_type (e.g., 'The Galactic Explorer'), neural_score (0-100), and a brief ai_analysis.";
+
+        try {
+            $response = Http::withToken($this->apiKey)
+                ->post('https://api.openai.com/v1/chat/completions', [
+                    'model' => 'gpt-4o',
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You are the Aatithya360 Neural AI engine.'],
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'response_format' => ['type' => 'json_object'],
+                ]);
+
+            if ($response->successful()) {
+                $content = json_decode($response->json()['choices'][0]['message']['content'], true);
+                return $content;
+            }
+            throw new \Exception($response->body());
+        } catch (\Exception $e) {
+            Log::error("OpenAI Neural Profiling Error: " . $e->getMessage());
+            return [
+                'personality_type' => 'Default Traveler',
+                'neural_score' => 75.0,
+                'ai_analysis' => 'Standard profiling active due to neural interface bypass.'
+            ];
+        }
+    }
+
+    /**
+     * Assess a recruitment lead using AI.
+     */
+    public function assessCandidate($candidateData)
+    {
+        $prompt = "Assess the following hospitality candidate for a high-end luxury resort role:\n" .
+            json_encode($candidateData) . "\n\n" .
+            "Return a JSON object with: fit_score (0-100), key_strengths (array), and recommendation (Proceed/Review).";
+
+        try {
+            $response = Http::withToken($this->apiKey)
+                ->post('https://api.openai.com/v1/chat/completions', [
+                    'model' => 'gpt-4o',
+                    'messages' => [
+                        ['role' => 'system', 'content' => 'You are the Aatithya360 AI Recruiter.'],
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'response_format' => ['type' => 'json_object'],
+                ]);
+
+            if ($response->successful()) {
+                $content = json_decode($response->json()['choices'][0]['message']['content'], true);
+                return $content;
+            }
+            throw new \Exception($response->body());
+        } catch (\Exception $e) {
+            Log::error("OpenAI Recruitment Error: " . $e->getMessage());
+            return [
+                'fit_score' => 50,
+                'key_strengths' => ['Reliability'],
+                'recommendation' => 'Review'
+            ];
+        }
+    }
 }
